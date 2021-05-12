@@ -1,0 +1,2 @@
+#!/bin/bash
+sox /home/denjo/i1_expe/day2/doremi.wav -t raw -b 16 -c 1 -e s -r 22500 - | ./downsample 5 | play -t raw -b 16 -c 1 -e s -r 8820 -

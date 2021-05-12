@@ -1,0 +1,12 @@
+#include <stdio.h>
+
+int main(int argc, char** argv){
+  int fd = open(my_data,O_WRONLY);
+  int N = 256;
+  unsigned char data[N];
+  for (int i = 0; i < N; i++){
+    dat(a[i] = i;
+  }
+  write(fd, data, N);
+  close(fd);
+}
