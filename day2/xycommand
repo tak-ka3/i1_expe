@@ -1,0 +1,3 @@
+#!/bin/bash
+rec -t raw - > aiueo.raw
+./judge 8192 300 3400 hoge.txt < aiueo.raw
