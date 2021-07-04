@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 # define v_min 50
-# define v_max 2000
+# define v_max 4000
 
 typedef short sample_t;
 
@@ -203,7 +203,7 @@ int main(int argc, char ** argv) {
     // 標本はいくつか読み取る
     int cnt_ori = 0;
     for (int i = 0; i < n/2; i++){
-          fprintf(wp2, "%ld %f \n", 44100/n*i, cabs(Y[i]));
+          // fprintf(wp2, "%ld %f \n", 44100/n*i, cabs(Y[i]));
           if (44100 / n *i > v_min && 44100/n*i < v_max+5){
             y[cnt_ori] += cabs(Y[i]);
             cnt_ori++;
@@ -220,10 +220,24 @@ int main(int argc, char ** argv) {
     // write_n(1, m, buf);
     second_cnt++;
   }
+
+
+  double total_a2 = 0;
+  double total_i2 = 0;
+  double total_u2 = 0;
+  double total_e2 = 0;
+  double total_o2 = 0;
+  double total_y = 0; // 振幅の合計を求める
   for (int i = 0; i < v_cnt; i++){
-    y[i] /= cnt_while;
+    total_y += y[i];
   }
-  int fra[v_cnt];
+  // int v_cnt = (v_max - v_min)/ 5;
+  for (int i = 0; i < v_cnt; i++){
+    y[i] = y[i]/total_y*100;
+    fprintf(wp2, "%d %f \n", v_min+i*5, y[i]);
+  }
+
+  int fra[v_cnt]; // あくまで周波数を数える担当
   double ya[4096];
   double total_ya[v_cnt];
   int ya_len = sizeof(total_ya)/sizeof(total_ya[0]);
@@ -234,39 +248,41 @@ int main(int argc, char ** argv) {
   int cnta = 0;
   while(fscanf(wpa, "%d %lf\n", fra+ind, ya+ind) != EOF){
     if (*(fra+ind) > v_min && *(fra+ind) < v_max+5){
-      total_ya[ind] += ya[ind];
-      // printf("%d, %lf\n", *(fra+ind), *(ya+ind));
+      total_ya[ind+1] += ya[ind];
+      // printf("%d, ya[ind] = %lf, %lf\n", *(fra+ind), ya[ind], total_ya[ind]);
       if (ind+1 ==v_cnt){
           ind = -1;
           cnta++;
       }
       ind++;
     }
+    // printf("%d,%lf,%lf,%lf\n", ind, total_ya[ind],total_ya[0],total_ya[1]);
   }
-  for (int i = 0; i < v_cnt; i++){
-    total_ya[i] /= cnta;
-  }
+
   double total_yi[v_cnt];
   int yi_len = sizeof(total_yi)/sizeof(total_yi[0]);
+  int y_len = sizeof(ya)/sizeof(ya[0]);
+  printf("yi_len=%d, y_len=%d, v_cnt=%d\n", yi_len, y_len, v_cnt);
+  
   for (int i = 0; i < yi_len; i++){
     total_yi[i] = 0;
   }
   ind = 0;
   int cnti = 0;
+  double yi[4096];
   while(fscanf(wpi, "%d %lf\n", fra+ind, ya+ind) != EOF){
     if (*(fra+ind) > v_min && *(fra+ind) < v_max+5){
-      total_yi[ind] += ya[ind];
+      total_yi[ind+1] += ya[ind];
       // printf("%d, %lf\n", *(fra+ind), *(ya+ind));
       if (ind+1 ==v_cnt){
           ind = -1;
           cnti++;
       }
       ind++;
+      // printf("fra+ind=%d, ind=%d, v_max=%d, v_min=%d\n", *(fra+ind), ind, v_max, v_min);
     }
   }
-  for (int i = 0; i < v_cnt; i++){
-    total_yi[i] /= cnti;
-  }
+  printf("ind=%d\n", ind);
 
   double total_yu[v_cnt];
   int yu_len = sizeof(total_yu)/sizeof(total_yu[0]);
@@ -277,7 +293,7 @@ int main(int argc, char ** argv) {
   int cntu = 0;
   while(fscanf(wpu, "%d %lf\n", fra+ind, ya+ind) != EOF){
     if (*(fra+ind) > v_min && *(fra+ind) < v_max+5){
-      total_yu[ind] += ya[ind];
+      total_yu[ind+1] += ya[ind];
       // printf("%d, %lf\n", *(fra+ind), *(ya+ind));
       if (ind+1 ==v_cnt){
           ind = -1;
@@ -285,9 +301,7 @@ int main(int argc, char ** argv) {
       }
       ind++;
     }
-  }
-  for (int i = 0; i < v_cnt; i++){
-    total_yu[i] /= cntu;
+    // printf("fra+ind=%d, ind=%d, v_max=%d, v_min=%d\n", *(fra+ind), ind, v_max, v_min);
   }
 
   double total_ye[v_cnt];
@@ -299,7 +313,7 @@ int main(int argc, char ** argv) {
   int cnte = 0;
   while(fscanf(wpe, "%d %lf\n", fra+ind, ya+ind) != EOF){
     if (*(fra+ind) > v_min && *(fra+ind) < v_max+5){
-      total_ye[ind] += ya[ind];
+      total_ye[ind+1] += ya[ind];
       // printf("%d, %lf\n", *(fra+ind), *(ya+ind));
       if (ind+1 ==v_cnt){
           ind = -1;
@@ -307,9 +321,6 @@ int main(int argc, char ** argv) {
       }
       ind++;
     }
-  }
-  for (int i = 0; i < v_cnt; i++){
-    total_ye[i] /= cnte;
   }
 
   double total_yo[v_cnt];
@@ -321,7 +332,7 @@ int main(int argc, char ** argv) {
   int cnto = 0;
   while(fscanf(wpo, "%d %lf\n", fra+ind, ya+ind) != EOF){
     if (*(fra+ind) > v_min && *(fra+ind) < v_max+5){
-      total_yo[ind] += ya[ind];
+      total_yo[ind+1] += ya[ind];
       // printf("%d, %lf\n", *(fra+ind), *(ya+ind));
       if (ind+1 ==v_cnt){
           ind = -1;
@@ -330,17 +341,23 @@ int main(int argc, char ** argv) {
       ind++;
     }
   }
-  for (int i = 0; i < v_cnt; i++){
-    total_yo[i] /= cnto;
-  }
 
-  double total_a2 = 0;
-  double total_i2 = 0;
-  double total_u2 = 0;
-  double total_e2 = 0;
-  double total_o2 = 0;
+  // for (int i = 0; i < v_cnt; i++){
+  //   if (i > 90){
+  //     printf("%d, %f\n", i, y[i]);
+  //     if (y[i] > 500){
+  //       break;
+  //     }
+  //     if (i == v_cnt-1){
+  //       printf("i\n");
+  //       fclose(wp);
+  //       return 0;
+  //     }
+  //   }
+  // }
+
   for (int i = 0; i < v_cnt; i++){
-    // printf("%f,%f\n", total_ya[i], total_ye[i]);
+    printf("total_ya[i]=%f, y[i]=%f\n", total_ya[i], y[i]);
     total_a2 += pow(y[i]-total_ya[i], 2)/100000;
     total_i2 += pow(y[i]-total_yi[i], 2)/100000;
     total_u2 += pow(y[i]-total_yu[i], 2)/100000;
