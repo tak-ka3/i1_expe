@@ -112,14 +112,6 @@ void fft(complex double * x,
   for (i = 0; i < n; i++) y[i] /= n;
 }
 
-void ifft(complex double * y, 
-	  complex double * x, 
-	  long n) {
-  double arg = 2.0 * M_PI / n;
-  complex double w = cos(arg) + 1.0j * sin(arg);
-  fft_r(y, x, n, w);
-}
-
 int pow2check(long N) {
   long n = N;
   while (n > 1) {
@@ -150,7 +142,6 @@ int main(int argc, char ** argv) {
     fprintf(stderr, "error : n (%ld) not a power of two\n", n);
     exit(1);
   }
-  FILE * wp = fopen("fft.dat", "wb");
   FILE * wp2 = fopen(filename, "wb");
 
   FILE * wpa;
@@ -173,7 +164,6 @@ int main(int argc, char ** argv) {
   if ((wpo = fopen("o.txt", "rb")) == NULL){
       die("fileopen");
   }
-  if (wp == NULL) die("fopen");
   sample_t * buf = calloc(sizeof(sample_t), n);
   complex double * X = calloc(sizeof(complex double), n);
   complex double * Y = calloc(sizeof(complex double), n);
@@ -181,8 +171,6 @@ int main(int argc, char ** argv) {
   for (int i = 0; i < v_cnt; i++){
     y[i] = 0;
   }
-  int cnt_while = 0; // 何回yが足されたか数える
-  int second_cnt = 0;
   while (1) {
     /* 標準入力からn個標本を読む */
     ssize_t m = read_n(0, n * sizeof(sample_t), buf);
@@ -191,31 +179,16 @@ int main(int argc, char ** argv) {
     sample_to_complex(buf, X, n);
     /* FFT -> Y */
     fft(X, Y, n);
-    
-    // print_complex(wp, Y, n);
-    // fprintf(wp, "----------------\n");
 	
     // 標本はいくつか読み取る
     int cnt_ori = 0;
     for (int i = 0; i < n/2; i++){
-          // fprintf(wp2, "%ld %f \n", 44100/n*i, cabs(Y[i]));
           if (44100 / n *i > v_min && 44100/n*i < v_max+5){
             y[cnt_ori] += cabs(Y[i]);
             cnt_ori++;
           }
     }
-    cnt_while++;
-
-    // 上のやつの平均を取ったものが必要そう
-    /* IFFT -> Z */
-    ifft(Y, X, n);
-    /* 標本の配列に変換 */
-    complex_to_sample(X, buf, n);
-    /* 標準出力へ出力 */
-    // write_n(1, m, buf);
-    second_cnt++;
   }
-
 
   double total_a2 = 0;
   double total_i2 = 0;
@@ -226,7 +199,6 @@ int main(int argc, char ** argv) {
   for (int i = 0; i < v_cnt; i++){
     total_y += y[i];
   }
-  // int v_cnt = (v_max - v_min)/ 5;
   for (int i = 0; i < v_cnt; i++){
     y[i] = y[i]/total_y*100;
     fprintf(wp2, "%d %f \n", v_min+i*5, pow(y[i],2));
@@ -244,14 +216,12 @@ int main(int argc, char ** argv) {
   while(fscanf(wpa, "%d %lf\n", fra+ind, ya+ind) != EOF){
     if (*(fra+ind) > v_min && *(fra+ind) < v_max+5){
       total_ya[ind+1] += ya[ind];
-      // printf("%d, ya[ind] = %lf, %lf\n", *(fra+ind), ya[ind], total_ya[ind]);
       if (ind+1 ==v_cnt){
           ind = -1;
           cnta++;
       }
       ind++;
     }
-    // printf("%d,%lf,%lf,%lf\n", ind, total_ya[ind],total_ya[0],total_ya[1]);
   }
 
   double total_yi[v_cnt];
@@ -267,13 +237,11 @@ int main(int argc, char ** argv) {
   while(fscanf(wpi, "%d %lf\n", fra+ind, ya+ind) != EOF){
     if (*(fra+ind) > v_min && *(fra+ind) < v_max+5){
       total_yi[ind+1] += ya[ind];
-      // printf("%d, %lf\n", *(fra+ind), *(ya+ind));
       if (ind+1 ==v_cnt){
           ind = -1;
           cnti++;
       }
       ind++;
-      // printf("fra+ind=%d, ind=%d, v_max=%d, v_min=%d\n", *(fra+ind), ind, v_max, v_min);
     }
   }
 
@@ -287,14 +255,12 @@ int main(int argc, char ** argv) {
   while(fscanf(wpu, "%d %lf\n", fra+ind, ya+ind) != EOF){
     if (*(fra+ind) > v_min && *(fra+ind) < v_max+5){
       total_yu[ind+1] += ya[ind];
-      // printf("%d, %lf\n", *(fra+ind), *(ya+ind));
       if (ind+1 ==v_cnt){
           ind = -1;
           cntu++;
       }
       ind++;
     }
-    // printf("fra+ind=%d, ind=%d, v_max=%d, v_min=%d\n", *(fra+ind), ind, v_max, v_min);
   }
 
   double total_ye[v_cnt];
@@ -307,7 +273,6 @@ int main(int argc, char ** argv) {
   while(fscanf(wpe, "%d %lf\n", fra+ind, ya+ind) != EOF){
     if (*(fra+ind) > v_min && *(fra+ind) < v_max+5){
       total_ye[ind+1] += ya[ind];
-      // printf("%d, %lf\n", *(fra+ind), *(ya+ind));
       if (ind+1 ==v_cnt){
           ind = -1;
           cnte++;
@@ -326,7 +291,6 @@ int main(int argc, char ** argv) {
   while(fscanf(wpo, "%d %lf\n", fra+ind, ya+ind) != EOF){
     if (*(fra+ind) > v_min && *(fra+ind) < v_max+5){
       total_yo[ind+1] += ya[ind];
-      // printf("%d, %lf\n", *(fra+ind), *(ya+ind));
       if (ind+1 ==v_cnt){
           ind = -1;
           cnto++;
@@ -336,7 +300,6 @@ int main(int argc, char ** argv) {
   }
 
   for (int i = 0; i < v_cnt; i++){
-    // printf("v_min+i*5=%d, y[i]=%f\n", v_min+i*5, pow(y[i], 2));
     total_a2 += pow(pow(y[i], 2)-total_ya[i], 2);
     total_i2 += pow(pow(y[i], 2)-total_yi[i], 2);
     total_u2 += pow(pow(y[i], 2)-total_yu[i], 2);
@@ -368,15 +331,7 @@ int main(int argc, char ** argv) {
       }
     }
   }
-  // printf("%f-%f\n", high_a, low_a);
-  // if (high_a - low_a > 0.3){
-  //   printf("aaa\n");
-  //   return 0;
-  // }
-
-  // printf("%f, %f, %f, %f, %f\n", total_a2, total_i2, total_u2, total_e2, total_o2);
   double mint = min5(total_a2, total_i2, total_u2, total_o2);
-  // printf("mint=%f\n", mint);
   if (mint == total_a2){
     printf("a\n");
   }else if(mint == total_i2){
@@ -386,7 +341,12 @@ int main(int argc, char ** argv) {
   }else{
     printf("o\n");
   }
-
-  fclose(wp);
+  fclose(wp2);
+  fclose(wpa);
+  fclose(wpi);
+  fclose(wpu);
+  fclose(wpe);
+  fclose(wpo);
+  
   return 0;
 }
