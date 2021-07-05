@@ -17,10 +17,8 @@ int main(int argc, char** argv){
     int n = read(fd, data, N);
     if (n == -1){perror("read");exit(1);}
     if (n == 0) break;
-    for (int i = 0; i < N; i++){
-      printf("%d %d\n", j, data[i]);
-      j++;
-    }
+    printf("%d %d\n", j, data[0]);
+    j++;
   }
   close(fd);
 }
