@@ -166,7 +166,7 @@ int main(int argc, char ** argv) {
     fprintf(wp, "----------------\n");
 	
 	for (int i = 0; i < n/2; i++){
-		if (44100/n*i > low || 44100/n*i < high){
+		if (44100/n*i > low && 44100/n*i < high){
 			Y[i] = 0;
 			Y[n-i-1] = 0;
 		}
