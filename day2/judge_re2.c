@@ -145,9 +145,7 @@ int main(int argc, char ** argv) {
   int v_cnt = (v_max - v_min)/ 5;
   (void)argc;
   long n = atol(argv[1]);
-  int low = atol(argv[2]);
-  int high = atol(argv[3]);
-  char *filename = argv[4];
+  char *filename = argv[2];
   if (!pow2check(n)) {
     fprintf(stderr, "error : n (%ld) not a power of two\n", n);
     exit(1);
