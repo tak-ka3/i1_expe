@@ -57,6 +57,6 @@ ax4.grid(which='both', linestyle='--', linewidth=0.2)
 plt.minorticks_on()
 
 ax5.grid(which='both', linestyle='--', linewidth=0.2)
-plt.minorticks_on()
+# plt.minorticks_on()
 
 plt.show()

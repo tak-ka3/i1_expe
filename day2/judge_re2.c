@@ -10,16 +10,13 @@
 
 typedef short sample_t;
 
-double min5(double a, double b, double c, double d, double e){
+double min5(double a, double b, double c, double e){
   double m = a;
   if (m > b){
     m = b;
   }
   if (m > c){
     m = c;
-  }
-  if (m > d){
-    m = d;
   }
   if (m > e){
     m = e;
@@ -262,7 +259,6 @@ int main(int argc, char ** argv) {
   double total_yi[v_cnt];
   int yi_len = sizeof(total_yi)/sizeof(total_yi[0]);
   int y_len = sizeof(ya)/sizeof(ya[0]);
-  printf("yi_len=%d, y_len=%d, v_cnt=%d\n", yi_len, y_len, v_cnt);
   
   for (int i = 0; i < yi_len; i++){
     total_yi[i] = 0;
@@ -282,7 +278,6 @@ int main(int argc, char ** argv) {
       // printf("fra+ind=%d, ind=%d, v_max=%d, v_min=%d\n", *(fra+ind), ind, v_max, v_min);
     }
   }
-  printf("ind=%d\n", ind);
 
   double total_yu[v_cnt];
   int yu_len = sizeof(total_yu)/sizeof(total_yu[0]);
@@ -342,22 +337,8 @@ int main(int argc, char ** argv) {
     }
   }
 
-  // for (int i = 0; i < v_cnt; i++){
-  //   if (i > 90){
-  //     printf("%d, %f\n", i, y[i]);
-  //     if (y[i] > 500){
-  //       break;
-  //     }
-  //     if (i == v_cnt-1){
-  //       printf("i\n");
-  //       fclose(wp);
-  //       return 0;
-  //     }
-  //   }
-  // }
-
   for (int i = 0; i < v_cnt; i++){
-    printf("total_ya[i]=%f, y[i]=%f\n", total_ya[i], pow(y[i], 2));
+    // printf("v_min+i*5=%d, y[i]=%f\n", v_min+i*5, pow(y[i], 2));
     total_a2 += pow(pow(y[i], 2)-total_ya[i], 2);
     total_i2 += pow(pow(y[i], 2)-total_yi[i], 2);
     total_u2 += pow(pow(y[i], 2)-total_yu[i], 2);
@@ -365,17 +346,45 @@ int main(int argc, char ** argv) {
     total_o2 += pow(pow(y[i], 2)-total_yo[i], 2);
   }
 
-  printf("%f, %f, %f, %f, %f\n", total_a2, total_i2, total_u2, total_e2, total_o2);
-  double mint = min5(total_a2, total_i2, total_u2, total_e2, total_o2);
-  printf("mint=%f\n", mint);
+  double low2 = 10.0;
+  for (int i = 0; i < v_cnt; i++){
+    if (*(fra+i) < 800 && low2 > pow(y[i], 2)){
+      low2 = pow(y[i], 2);
+    }
+    else if (*(fra+i) > 835 && *(fra+i) < 890){
+      if (pow(y[i], 2) - low2 > 0.04){
+        printf("e\n");
+        return 0;
+      }
+    }
+  }
+  double low_a = 100;
+  double high_a = 0;
+  for (int i = 0; i < v_cnt; i++){
+    if (*(fra+i) > 195 && *(fra+i) < 305){
+      if (low_a > pow(y[i], 2)){
+        low_a = pow(y[i], 2);
+      }
+      if (high_a < pow(y[i], 2)){
+        high_a = pow(y[i], 2);
+      }
+    }
+  }
+  // printf("%f-%f\n", high_a, low_a);
+  // if (high_a - low_a > 0.3){
+  //   printf("aaa\n");
+  //   return 0;
+  // }
+
+  // printf("%f, %f, %f, %f, %f\n", total_a2, total_i2, total_u2, total_e2, total_o2);
+  double mint = min5(total_a2, total_i2, total_u2, total_o2);
+  // printf("mint=%f\n", mint);
   if (mint == total_a2){
     printf("a\n");
   }else if(mint == total_i2){
     printf("i\n");
   }else if(mint == total_u2){
     printf("u\n");
-  }else if(mint == total_e2){
-    printf("e\n");
   }else{
     printf("o\n");
   }
