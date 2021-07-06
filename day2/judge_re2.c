@@ -5,8 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <signal.h>
 # define v_min 50
-# define v_max 4000
+# define v_max 2000
 
 typedef short sample_t;
 
@@ -132,6 +133,10 @@ void print_complex(FILE * wp,
   }
 }
 
+void my_handler(){
+  printf("Finish!\n");
+}
+
 
 int main(int argc, char ** argv) {
   int v_cnt = (v_max - v_min)/ 5;
@@ -188,6 +193,8 @@ int main(int argc, char ** argv) {
             cnt_ori++;
           }
     }
+    // signal(SIGINT, my_handler);
+    // puts("Ctr+C");
   }
 
   double total_a2 = 0;

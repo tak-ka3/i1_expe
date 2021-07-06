@@ -1,3 +1,6 @@
 #!/bin/bash
-rec -t raw - > aiueo.raw
-./judge_re2 8192 hoge.txt < aiueo.raw
+while true; do
+    rec -t raw - > aiueo.raw
+    ./judge_re2 8192 hoge.txt < aiueo.raw
+    sleep 1
+done
