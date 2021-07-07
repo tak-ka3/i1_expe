@@ -320,7 +320,7 @@ int main(int argc, char ** argv) {
       low2 = pow(y[i], 2);
     }
     else if (*(fra+i) > 835 && *(fra+i) < 890){
-      if (pow(y[i], 2) - low2 > 0.04){
+      if (pow(y[i], 2) - low2 > 0.055){
         printf("e\n");
         return 0;
       }
