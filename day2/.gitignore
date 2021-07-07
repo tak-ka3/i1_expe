@@ -1,7 +1,6 @@
 a.dat
 a.gpl
 a.raw
-a.txt
 a.wav
 aiueo.raw
 b.raw
@@ -15,7 +14,6 @@ downsample
 ds
 ds5.raw
 e.raw
-e.txt
 fft
 fft.dat
 filename
@@ -34,7 +32,6 @@ mk_hitoshi
 na.raw
 nc
 o.raw
-o.txt
 orig.raw
 plot43.raw
 prac.raw
@@ -55,7 +52,6 @@ doremi.c~
 doremi.raw
 downsample.c~
 hoge~
-i.txt
 mk_data.c~
 mk_data2.c~
 mk_hitoshi.c~
@@ -63,5 +59,4 @@ read_data.c~
 read_data2.c~
 sin.c~
 sound.wav
-u.txt
 judge_re2
